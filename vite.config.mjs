@@ -4,6 +4,11 @@ import fs from "fs";
 import path from "path";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 
+// Clean dist folder before build
+if (fs.existsSync(path.resolve("dist"))) {
+  fs.rmSync(path.resolve("dist"), { recursive: true, force: true });
+}
+
 // Get all .html files in the root directory
 const htmlFiles = fs
   .readdirSync(path.resolve())
@@ -15,18 +20,15 @@ export default defineConfig({
     rollupOptions: {
       input: htmlFiles,
     },
+    assetsInlineLimit: 0,
   },
   plugins: [
     injectHTML(),
     viteStaticCopy({
       targets: [
         {
-          src: "assets/**/*", // Copy all files and subfolders in assets
-          dest: "assets", // Place them in the dist/assets folder
-        },
-        {
-          src: ["*", "!dist", "!dist/**/*"], // Exclude the dist folder
-          dest: "", // Place root files in the dist folder
+          src: "assets/**/*", // Only copy the assets folder
+          dest: "assets", // Place in the dist/assets folder
         },
       ],
     }),
